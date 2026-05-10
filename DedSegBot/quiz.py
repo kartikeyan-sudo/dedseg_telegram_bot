@@ -1,7 +1,8 @@
-import random
-import html
-import time
 import requests
+import json
+import random
+import time
+import html
 from deep_translator import GoogleTranslator
 from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
 
@@ -9,10 +10,10 @@ BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 CATEGORIES = {
     "📘 General Knowledge": 9,
-    "🔬 Science & Nature":  17,
-    "🌍 Geography":          22,
-    "🏛 History":            23,
-    "⚖ Politics":           24,
+    "🌍 Geography": 22,
+    "📜 History": 23,
+    "⚖️ Politics": 24,
+    "🔬 Science": 17,
 }
 
 
@@ -127,6 +128,9 @@ def send_daily_quiz(target_id=None):
                 print(f"[send_daily_quiz] question error: {e}")
                 continue
 
+    print("[send_daily_quiz] English + Hindi SSC/UPSC quizzes sent successfully!")
+
+
 def send_quick_quiz(target_id=None):
     """Sends a single question to quickly verify API and delivery."""
     send_message("🧪 <b>QUICK API TEST QUIZ</b>", target_id=target_id)
@@ -150,8 +154,6 @@ def send_quick_quiz(target_id=None):
         eng_opts = [o[:90] for o in eng_opts]
         
         send_poll(eng_q, eng_opts, eng_idx, f"✅ Correct Answer: {eng_opts[eng_idx]}", target_id=target_id)
-        print("✅ Quick quiz test sent successfully!")
+        print("[send_quick_quiz] Quick quiz test sent successfully!")
     except Exception as e:
         print(f"[send_quick_quiz] error: {e}")
-
-    print("✅ English + Hindi SSC/UPSC quizzes sent successfully!")
