@@ -2,3 +2,5 @@ requests
 apscheduler
 deep-translator
 python-dotenv
+fastapi
+uvicorn
