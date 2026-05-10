@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import threading
 import requests
 from DedSegBot.quiz import send_daily_quiz
 from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID, ADMIN_ID
@@ -118,15 +119,9 @@ def handle_update(update):
             if user_id != ADMIN_ID:
                 answer_callback_query(cb_id)
                 return
-            send_message(chat_id, "⏳ Starting quiz now...")
-            try:
-                send_daily_quiz()
-                send_message(chat_id, "✅ Quiz sent successfully!", reply_markup=ADMIN_MENU_INLINE)
-                answer_callback_query(cb_id, "✅ Quiz started!")
-            except Exception as e:
-                print(f"[run_quiz] error: {e}")
-                send_message(chat_id, "❌ Quiz failed to run. Check server logs.")
-                answer_callback_query(cb_id, "❌ Error")
+            send_message(chat_id, "⏳ Starting quiz in background...")
+            threading.Thread(target=send_daily_quiz, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Quiz started!")
             return
 
         if data == "menu":
@@ -177,13 +172,8 @@ def handle_update(update):
         return
 
     if cmd == "/quiz":
-        send_message(chat_id, "⏳ Starting quiz now...")
-        try:
-            send_daily_quiz()
-            send_message(chat_id, "✅ Quiz sent successfully!", reply_markup=ADMIN_MENU_INLINE)
-        except Exception as e:
-            print(f"[/quiz command] error: {e}")
-            send_message(chat_id, "❌ Quiz failed. Check server logs.")
+        send_message(chat_id, "⏳ Starting quiz in background...")
+        threading.Thread(target=send_daily_quiz, daemon=True).start()
         return
 
 

@@ -2,8 +2,10 @@ import json
 import os
 import sys
 import time
+import threading
 import requests
 from datetime import datetime
+from DedSegBot.quiz import send_daily_quiz
 from DedSegBot.broadcast import broadcast_message, copy_message_to_groups
 from DedSegBot.config import BOT_TOKEN, ADMIN_ID, GROUPS as STATIC_GROUPS
 
@@ -166,6 +168,9 @@ ADMIN_MENU_INLINE = {
         ],
         [
             {"text": "🧪 Test Bot",       "callback_data": "test"},
+            {"text": "📚 Run Quiz Now", "callback_data": "run_quiz"},
+        ],
+        [
             {"text": "❌ Cancel Action", "callback_data": "cancel"},
         ],
     ]
@@ -352,6 +357,12 @@ def handle_update(update):
             )
             set_pending_action(user_id, {"action": "message_user_id"})
             answer_callback_query(cb_id, "Send the target user ID.")
+            return
+
+        if data == "run_quiz":
+            send_message(chat_id, "⏳ Starting quiz in background...")
+            threading.Thread(target=send_daily_quiz, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Quiz started!")
             return
 
         if data == "cancel":
@@ -591,6 +602,11 @@ def handle_update(update):
             return
         ok, total = do_broadcast(chat_id, message_id, parts[1].strip())
         send_message(chat_id, f"✅ Broadcast sent to <b>{ok}/{total}</b> groups.")
+        return
+
+    if cmd == "/quiz":
+        send_message(chat_id, "⏳ Starting quiz in background...")
+        threading.Thread(target=send_daily_quiz, daemon=True).start()
         return
 
     if cmd == "/cancel":

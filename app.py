@@ -1,6 +1,6 @@
 import threading
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 
 from DedSegBot.quiz import send_daily_quiz
 from DedSegBot.facts import send_daily_fact
@@ -28,37 +28,24 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def home():
-
     return {
         "status": "DedSeg Backend Running"
     }
 
 
 @app.get("/run-quiz")
-def run_quiz():
-
-    send_daily_quiz()
-
-    return {
-        "message": "Quiz sent successfully"
-    }
+def run_quiz(background_tasks: BackgroundTasks):
+    background_tasks.add_task(send_daily_quiz)
+    return {"message": "Quiz started in background"}
 
 
 @app.get("/send-fact")
-def send_fact():
-
-    send_daily_fact()
-
-    return {
-        "message": "Fact sent successfully"
-    }
+def send_fact(background_tasks: BackgroundTasks):
+    background_tasks.add_task(send_daily_fact)
+    return {"message": "Fact sending started in background"}
 
 
 @app.get("/send-motivation")
-def motivation():
-
-    send_motivation()
-
-    return {
-        "message": "Motivation sent successfully"
-    }
+def motivation(background_tasks: BackgroundTasks):
+    background_tasks.add_task(send_motivation)
+    return {"message": "Motivation sending started in background"}
