@@ -1,0 +1,25 @@
+services:
+  - type: worker
+    name: dedseg-bot
+    runtime: python
+    buildCommand: pip install -r DedSegBot/requirements.txt
+    startCommand: python run.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: QUIZ_BOT_TOKEN
+        sync: false
+      - key: QUIZ_CHAT_ID
+        sync: false
+      - key: GROUP_1_ID
+        sync: false
+      - key: GROUP_2_ID
+        sync: false
+      - key: GROUP_3_ID
+        sync: false
+      - key: GROUP_4_ID
+        sync: false
+      - key: GROUP_5_ID
+        sync: false
