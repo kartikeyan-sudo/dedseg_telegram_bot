@@ -21,10 +21,11 @@ def send_motivation():
         text = f"🔥 DAILY MOTIVATION\n\n{FALLBACK_QUOTE}"
 
     try:
-        requests.post(
+        r = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             json={"chat_id": QUIZ_CHAT_ID, "text": text},
             timeout=15,
         )
+        print(f"[motivation] Telegram response: {r.text}")
     except Exception as e:
         print(f"[motivation] error sending: {e}")

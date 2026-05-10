@@ -12,7 +12,7 @@ def send_daily_fact():
         fact = "Did you know? Every day is a new opportunity to learn something amazing!"
 
     try:
-        requests.post(
+        r = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             json={
                 "chat_id": QUIZ_CHAT_ID,
@@ -20,5 +20,6 @@ def send_daily_fact():
             },
             timeout=15,
         )
+        print(f"[facts] Telegram response: {r.text}")
     except Exception as e:
         print(f"[facts] error sending fact: {e}")

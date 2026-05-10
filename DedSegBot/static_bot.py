@@ -4,6 +4,8 @@ import time
 import threading
 import requests
 from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.facts import send_daily_fact
+from DedSegBot.motivation import send_motivation
 from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID, ADMIN_ID
 from DedSegBot.scheduler import start_scheduler
 
@@ -169,6 +171,16 @@ def handle_update(update):
 
     if cmd in ("/start", "/menu", "/help"):
         send_message(chat_id, build_menu_text(), reply_markup=ADMIN_MENU_INLINE)
+        return
+
+    if cmd == "/motivation":
+        send_message(chat_id, "⏳ Sending motivation...")
+        threading.Thread(target=send_motivation, daemon=True).start()
+        return
+
+    if cmd == "/fact":
+        send_message(chat_id, "⏳ Sending GK fact...")
+        threading.Thread(target=send_daily_fact, daemon=True).start()
         return
 
     if cmd == "/quiz":

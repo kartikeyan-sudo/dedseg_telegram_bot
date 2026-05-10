@@ -6,6 +6,8 @@ import threading
 import requests
 from datetime import datetime
 from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.facts import send_daily_fact
+from DedSegBot.motivation import send_motivation
 from DedSegBot.broadcast import broadcast_message, copy_message_to_groups
 from DedSegBot.config import BOT_TOKEN, ADMIN_ID, GROUPS as STATIC_GROUPS
 
@@ -593,6 +595,16 @@ def handle_update(update):
             send_message(chat_id, f"✅ Reply sent to <code>{target_id}</code>.")
         else:
             send_message(chat_id, f"❌ Failed: {result.get('description', 'unknown error')}")
+        return
+
+    if cmd == "/motivation":
+        send_message(chat_id, "⏳ Sending motivation...")
+        threading.Thread(target=send_motivation, daemon=True).start()
+        return
+
+    if cmd == "/fact":
+        send_message(chat_id, "⏳ Sending GK fact...")
+        threading.Thread(target=send_daily_fact, daemon=True).start()
         return
 
     if cmd == "/broadcast":
