@@ -1,5 +1,5 @@
 import requests
-from config import BOT_TOKEN, GROUPS as STATIC_GROUPS
+from DedSegBot.config import BOT_TOKEN, GROUPS as STATIC_GROUPS
 
 
 def broadcast_message(message, target_id=None, parse_mode="HTML", groups=None):

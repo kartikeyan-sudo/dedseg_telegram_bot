@@ -2,9 +2,9 @@ import json
 import os
 import time
 import requests
-from quiz import send_daily_quiz
-from quiz_config import BOT_TOKEN, QUIZ_CHAT_ID, ADMIN_ID
-from scheduler import start_scheduler
+from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID, ADMIN_ID
+from DedSegBot.scheduler import start_scheduler
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 OFFSET_FILE = os.path.join(os.path.dirname(__file__), "quiz_update_offset.txt")

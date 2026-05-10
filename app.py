@@ -1,25 +1,45 @@
 from fastapi import FastAPI
 
+from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.facts import send_daily_fact
+from DedSegBot.motivation import send_motivation
+
 app = FastAPI()
 
 
 @app.get("/")
 def home():
-    return {"status": "running"}
+
+    return {
+        "status": "DedSeg Backend Running"
+    }
 
 
-@app.get("/test")
-def test():
+@app.get("/run-quiz")
+def run_quiz():
 
-    try:
-        from DedSegBot.quiz import send_daily_quiz
+    send_daily_quiz()
 
-        return {
-            "status": "quiz import successful"
-        }
+    return {
+        "message": "Quiz sent successfully"
+    }
 
-    except Exception as e:
 
-        return {
-            "error": str(e)
-        }
+@app.get("/send-fact")
+def send_fact():
+
+    send_daily_fact()
+
+    return {
+        "message": "Fact sent successfully"
+    }
+
+
+@app.get("/send-motivation")
+def motivation():
+
+    send_motivation()
+
+    return {
+        "message": "Motivation sent successfully"
+    }

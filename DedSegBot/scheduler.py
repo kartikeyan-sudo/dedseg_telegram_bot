@@ -1,8 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from quiz import send_daily_quiz
-from motivation import send_motivation
-from facts import send_daily_fact
+from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.motivation import send_motivation
+from DedSegBot.facts import send_daily_fact
 
 scheduler = BackgroundScheduler()
 

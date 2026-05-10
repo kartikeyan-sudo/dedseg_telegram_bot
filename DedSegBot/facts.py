@@ -1,5 +1,5 @@
 import requests
-from quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
+from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
 
 
 def send_daily_fact():

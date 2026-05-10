@@ -3,7 +3,7 @@ import html
 import time
 import requests
 from deep_translator import GoogleTranslator
-from quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
+from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 

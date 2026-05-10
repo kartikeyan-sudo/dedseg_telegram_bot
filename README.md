@@ -90,12 +90,14 @@ cd DedSegBot && python static_bot.py
 
 ```
 dedseg_telegram_bot/
+├── app.py                   # FastAPI backend for Render deployment
 ├── run.py                   # Unified entry point (both bots in threads)
-├── Procfile                 # Render/Railway deployment
-├── render.yaml              # Render one-click deploy config
+├── Procfile                 # Heroku/Railway deployment
+├── render.yaml              # Render deployment config (Web Service)
 ├── .env.example             # Environment variable template
 ├── .gitattributes           # LF line ending enforcement
 ├── DedSegBot/
+│   ├── __init__.py          # Package initialization
 │   ├── main.py              # Main admin control bot
 │   ├── static_bot.py        # GK quiz bot with scheduler
 │   ├── config.py            # Main bot config (env-aware)
@@ -170,7 +172,7 @@ dedseg_telegram_bot/
 2. **Go to [render.com](https://render.com)** and sign in with GitHub.
 
 3. **Create a new service:**
-   - Click **New → Background Worker**
+   - Click **New → Web Service**
    - Connect your `dedseg_telegram_bot` repository
    - Render will auto-detect `render.yaml`
 

@@ -4,8 +4,8 @@ import sys
 import time
 import requests
 from datetime import datetime
-from broadcast import broadcast_message, copy_message_to_groups
-from config import BOT_TOKEN, ADMIN_ID, GROUPS as STATIC_GROUPS
+from DedSegBot.broadcast import broadcast_message, copy_message_to_groups
+from DedSegBot.config import BOT_TOKEN, ADMIN_ID, GROUPS as STATIC_GROUPS
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 OFFSET_FILE = os.path.join(os.path.dirname(__file__), "update_offset.txt")

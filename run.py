@@ -18,8 +18,8 @@ BOT_DIR = os.path.join(os.path.dirname(__file__), "DedSegBot")
 if BOT_DIR not in sys.path:
     sys.path.insert(0, BOT_DIR)
 
-from main import run_main_bot
-from static_bot import run_static_bot
+from DedSegBot.main import run_main_bot
+from DedSegBot.static_bot import run_static_bot
 
 
 def main():
