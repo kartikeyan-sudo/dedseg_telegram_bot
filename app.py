@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+
 from DedSegBot.quiz import send_daily_quiz
 from DedSegBot.facts import send_daily_fact
 from DedSegBot.motivation import send_motivation
 
 app = FastAPI()
+
 
 @app.get("/")
 def home():
@@ -11,6 +13,7 @@ def home():
     return {
         "status": "DedSeg Backend Running"
     }
+
 
 @app.get("/run-quiz")
 def run_quiz():
@@ -21,6 +24,7 @@ def run_quiz():
         "message": "Quiz sent successfully"
     }
 
+
 @app.get("/send-fact")
 def send_fact():
 
@@ -30,8 +34,9 @@ def send_fact():
         "message": "Fact sent successfully"
     }
 
+
 @app.get("/send-motivation")
-def send_motivation_api():
+def motivation():
 
     send_motivation()
 
