@@ -1,3 +1,4 @@
 requests
 apscheduler
 deep-translator
+python-dotenv
