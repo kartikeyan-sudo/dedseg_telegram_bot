@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from DedSegBot.quiz import send_daily_quiz
 
+app = FastAPI()
 
 @app.get("/")
 def home():
