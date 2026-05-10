@@ -161,40 +161,8 @@ def handle_update(update):
                 "📩 Send us a message anytime and our team will respond.",
             )
             return
-        # Forward any content (text or media) to admin
-        media_keys = ("photo", "video", "document", "audio", "voice",
-                      "sticker", "animation", "video_note")
-        is_media = any(message.get(k) for k in media_keys)
-        has_content = text or is_media
-        if has_content and not text.startswith("/"):
-            user_tag = f"@{username}" if username else f"ID: {user_id}"
-            if text and not is_media:
-                # Text-only: one message with text embedded (no double)
-                send_message(
-                    ADMIN_ID,
-                    f"💬 <b>[GK Bot] {first_name}</b> ({user_tag})\n"
-                    f"🆔 <code>{user_id}</code>  |  /reply {user_id} &lt;msg&gt;\n\n"
-                    f"{text}",
-                )
-            else:
-                # Media: compact header + copy (2 messages, unavoidable for media)
-                send_message(
-                    ADMIN_ID,
-                    f"📎 <b>[GK Bot] {first_name}</b> ({user_tag}) sent media\n"
-                    f"🆔 <code>{user_id}</code>  |  /reply {user_id} &lt;msg&gt;",
-                )
-                try:
-                    requests.post(
-                        f"{BASE_URL}/copyMessage",
-                        json={
-                            "chat_id": ADMIN_ID,
-                            "from_chat_id": chat_id,
-                            "message_id": message_id,
-                        },
-                        timeout=15,
-                    )
-                except Exception as e:
-                    print(f"[gk_bot copy_message] error: {e}")
+        # Forwarding disabled in GK Bot to avoid duplicate notifications.
+        # Use the Main Bot for contacting the team.
         return
 
     # ── Non-admin non-private: ignore ────────────────────────────────────────
