@@ -148,6 +148,7 @@ def handle_update(update):
     chat_type = message["chat"].get("type", "private")
     first_name = message["from"].get("first_name", "there")
     username = message["from"].get("username", "")
+    message_id = message["message_id"]
 
     # ── Non-admin private chat: Livegram welcome + message forwarding ─────────
     if chat_type == "private" and user_id != ADMIN_ID:
@@ -160,16 +161,40 @@ def handle_update(update):
                 "📩 Send us a message anytime and our team will respond.",
             )
             return
-        # Forward non-command text to admin
-        if text and not text.startswith("/"):
+        # Forward any content (text or media) to admin
+        media_keys = ("photo", "video", "document", "audio", "voice",
+                      "sticker", "animation", "video_note")
+        is_media = any(message.get(k) for k in media_keys)
+        has_content = text or is_media
+        if has_content and not text.startswith("/"):
             user_tag = f"@{username}" if username else f"ID: {user_id}"
-            send_message(
-                ADMIN_ID,
-                f"📩 <b>[GK Bot] Message from {first_name}</b> ({user_tag})\n"
-                f"🆔 User ID: <code>{user_id}</code>\n\n"
-                f"{text}",
-            )
-        # All other commands silently ignored for non-admins
+            if text and not is_media:
+                # Text-only: one message with text embedded (no double)
+                send_message(
+                    ADMIN_ID,
+                    f"💬 <b>[GK Bot] {first_name}</b> ({user_tag})\n"
+                    f"🆔 <code>{user_id}</code>  |  /reply {user_id} &lt;msg&gt;\n\n"
+                    f"{text}",
+                )
+            else:
+                # Media: compact header + copy (2 messages, unavoidable for media)
+                send_message(
+                    ADMIN_ID,
+                    f"📎 <b>[GK Bot] {first_name}</b> ({user_tag}) sent media\n"
+                    f"🆔 <code>{user_id}</code>  |  /reply {user_id} &lt;msg&gt;",
+                )
+                try:
+                    requests.post(
+                        f"{BASE_URL}/copyMessage",
+                        json={
+                            "chat_id": ADMIN_ID,
+                            "from_chat_id": chat_id,
+                            "message_id": message_id,
+                        },
+                        timeout=15,
+                    )
+                except Exception as e:
+                    print(f"[gk_bot copy_message] error: {e}")
         return
 
     # ── Non-admin non-private: ignore ────────────────────────────────────────
