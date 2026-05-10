@@ -127,4 +127,31 @@ def send_daily_quiz(target_id=None):
                 print(f"[send_daily_quiz] question error: {e}")
                 continue
 
+def send_quick_quiz(target_id=None):
+    """Sends a single question to quickly verify API and delivery."""
+    send_message("🧪 <b>QUICK API TEST QUIZ</b>", target_id=target_id)
+    category_name = "📘 General Knowledge"
+    category_id = 9
+    
+    questions = fetch_questions(category_id, amount=1)
+    if not questions:
+        send_message("❌ Failed to fetch test question.", target_id=target_id)
+        return
+
+    q = questions[0]
+    try:
+        eng_q = html.unescape(q["question"])
+        eng_correct = html.unescape(q["correct_answer"])
+        eng_incorrect = [html.unescape(o) for o in q["incorrect_answers"]]
+
+        eng_opts = eng_incorrect + [eng_correct]
+        random.shuffle(eng_opts)
+        eng_idx = eng_opts.index(eng_correct)
+        eng_opts = [o[:90] for o in eng_opts]
+        
+        send_poll(eng_q, eng_opts, eng_idx, f"✅ Correct Answer: {eng_opts[eng_idx]}", target_id=target_id)
+        print("✅ Quick quiz test sent successfully!")
+    except Exception as e:
+        print(f"[send_quick_quiz] error: {e}")
+
     print("✅ English + Hindi SSC/UPSC quizzes sent successfully!")

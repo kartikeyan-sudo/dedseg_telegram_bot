@@ -2,7 +2,7 @@ import threading
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, BackgroundTasks
 
-from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.quiz import send_daily_quiz, send_quick_quiz
 from DedSegBot.facts import send_daily_fact
 from DedSegBot.motivation import send_motivation
 from run import start_bots, wait_for_lock
@@ -37,6 +37,12 @@ def home():
 def run_quiz(background_tasks: BackgroundTasks):
     background_tasks.add_task(send_daily_quiz)
     return {"message": "Quiz started in background"}
+
+
+@app.get("/quick-test")
+def quick_test(background_tasks: BackgroundTasks):
+    background_tasks.add_task(send_quick_quiz)
+    return {"message": "Quick test quiz started in background"}
 
 
 @app.get("/send-fact")

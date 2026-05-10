@@ -3,7 +3,7 @@ import os
 import time
 import threading
 import requests
-from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.quiz import send_daily_quiz, send_quick_quiz
 from DedSegBot.facts import send_daily_fact
 from DedSegBot.motivation import send_motivation
 from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID, ADMIN_ID
@@ -14,8 +14,11 @@ OFFSET_FILE = os.path.join(os.path.dirname(__file__), "quiz_update_offset.txt")
 
 ADMIN_MENU_INLINE = {
     "inline_keyboard": [
-        [{"text": "📚 Run Quiz Now", "callback_data": "run_quiz"}],
-        [{"text": "📋 Menu", "callback_data": "menu"}],
+        [{"text": "📚 Send Full Quiz Set", "callback_data": "run_quiz"}],
+        [{"text": "🔥 Send Quote to Channel", "callback_data": "run_quote"}],
+        [{"text": "🧠 Send Fact to Channel", "callback_data": "run_fact"}],
+        [{"text": "🧪 Quick API Test Quiz", "callback_data": "run_test"}],
+        [{"text": "📋 Refresh Menu", "callback_data": "menu"}],
     ]
 }
 
@@ -117,17 +120,44 @@ def handle_update(update):
         cb_id = cb["id"]
 
         if data == "run_quiz":
-            # Only admin can trigger quiz manually
+            # Only admin can trigger quiz manually to channel
             if user_id != ADMIN_ID:
                 answer_callback_query(cb_id)
                 return
-            send_message(chat_id, "⏳ Starting quiz in background...")
+            send_message(chat_id, "⏳ Sending full quiz set to channel...")
             threading.Thread(target=send_daily_quiz, daemon=True).start()
             answer_callback_query(cb_id, "✅ Quiz started!")
             return
 
+        if data == "run_quote":
+            if user_id != ADMIN_ID:
+                answer_callback_query(cb_id)
+                return
+            send_message(chat_id, "⏳ Sending daily quote to channel...")
+            threading.Thread(target=send_motivation, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Quote sent!")
+            return
+
+        if data == "run_fact":
+            if user_id != ADMIN_ID:
+                answer_callback_query(cb_id)
+                return
+            send_message(chat_id, "⏳ Sending GK fact to channel...")
+            threading.Thread(target=send_daily_fact, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Fact sent!")
+            return
+
+        if data == "run_test":
+            if user_id != ADMIN_ID:
+                answer_callback_query(cb_id)
+                return
+            send_message(chat_id, "⏳ Running quick API test quiz in this chat...")
+            threading.Thread(target=send_quick_quiz, args=(chat_id,), daemon=True).start()
+            answer_callback_query(cb_id, "✅ Test quiz sent!")
+            return
+
         if data == "menu":
-            send_message(chat_id, build_menu_text(), reply_markup=ADMIN_MENU_INLINE if user_id == ADMIN_ID else None)
+            send_message(chat_id, build_menu_text(), reply_markup=ADMIN_MENU_INLINE)
             answer_callback_query(cb_id)
             return
 

@@ -5,7 +5,7 @@ import time
 import threading
 import requests
 from datetime import datetime
-from DedSegBot.quiz import send_daily_quiz
+from DedSegBot.quiz import send_daily_quiz, send_quick_quiz
 from DedSegBot.facts import send_daily_fact
 from DedSegBot.motivation import send_motivation
 from DedSegBot.broadcast import broadcast_message, copy_message_to_groups
@@ -169,10 +169,14 @@ ADMIN_MENU_INLINE = {
             {"text": "➕ Add Group",    "callback_data": "add_group"},
         ],
         [
-            {"text": "🧪 Test Bot",       "callback_data": "test"},
-            {"text": "📚 Run Quiz Now", "callback_data": "run_quiz"},
+            {"text": "📚 Send Full Quiz Set", "callback_data": "run_quiz"},
         ],
         [
+            {"text": "🔥 Send Quote to Channel", "callback_data": "run_quote"},
+            {"text": "🧠 Send Fact to Channel", "callback_data": "run_fact"},
+        ],
+        [
+            {"text": "🧪 Quick API Test Quiz", "callback_data": "run_test"},
             {"text": "❌ Cancel Action", "callback_data": "cancel"},
         ],
     ]
@@ -362,9 +366,27 @@ def handle_update(update):
             return
 
         if data == "run_quiz":
-            send_message(chat_id, "⏳ Starting quiz in background...")
+            send_message(chat_id, "⏳ Sending full quiz set to channel...")
             threading.Thread(target=send_daily_quiz, daemon=True).start()
             answer_callback_query(cb_id, "✅ Quiz started!")
+            return
+
+        if data == "run_quote":
+            send_message(chat_id, "⏳ Sending daily quote to channel...")
+            threading.Thread(target=send_motivation, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Quote sent!")
+            return
+
+        if data == "run_fact":
+            send_message(chat_id, "⏳ Sending GK fact to channel...")
+            threading.Thread(target=send_daily_fact, daemon=True).start()
+            answer_callback_query(cb_id, "✅ Fact sent!")
+            return
+
+        if data == "run_test":
+            send_message(chat_id, "⏳ Running quick API test quiz in this chat...")
+            threading.Thread(target=send_quick_quiz, args=(chat_id,), daemon=True).start()
+            answer_callback_query(cb_id, "✅ Test quiz sent!")
             return
 
         if data == "cancel":
