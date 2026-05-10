@@ -434,8 +434,31 @@ def handle_update(update):
                 copy_message(from_chat_id=chat_id, message_id=message_id, to_chat_id=ADMIN_ID)
         return
 
-    # ── Non-admin non-private: ignore ─────────────────────────────────────────
-    if user_id != ADMIN_ID:
+    # ── Command Triggers (Public in Groups, Admin-only in DM) ─────────────────
+    cmd = text.split()[0].lower() if text else ""
+    is_admin = (user_id == ADMIN_ID)
+
+    if cmd == "/motivation":
+        send_message(chat_id, "⏳ Sending motivation...")
+        threading.Thread(target=send_motivation, args=(chat_id,), daemon=True).start()
+        return
+
+    if cmd in ("/fact", "/oneliner"):
+        send_message(chat_id, "⏳ Sending one-liner...")
+        threading.Thread(target=send_daily_fact, args=(chat_id,), daemon=True).start()
+        return
+
+    if cmd == "/quiz":
+        # Quizzes are long; keep them admin-only to avoid spam
+        if not is_admin:
+            send_message(chat_id, "⚠️ Only admins can trigger a full quiz set.")
+            return
+        send_message(chat_id, "⏳ Starting quiz in background...")
+        threading.Thread(target=send_daily_quiz, args=(chat_id,), daemon=True).start()
+        return
+
+    # ── Non-admin non-private: ignore rest ───────────────────────────────────
+    if not is_admin:
         return
 
     # ── Admin pending action ──────────────────────────────────────────────────
@@ -597,15 +620,6 @@ def handle_update(update):
             send_message(chat_id, f"❌ Failed: {result.get('description', 'unknown error')}")
         return
 
-    if cmd == "/motivation":
-        send_message(chat_id, "⏳ Sending motivation...")
-        threading.Thread(target=send_motivation, daemon=True).start()
-        return
-
-    if cmd == "/fact":
-        send_message(chat_id, "⏳ Sending GK fact...")
-        threading.Thread(target=send_daily_fact, daemon=True).start()
-        return
 
     if cmd == "/broadcast":
         parts = text.split(" ", 1)
@@ -616,10 +630,6 @@ def handle_update(update):
         send_message(chat_id, f"✅ Broadcast sent to <b>{ok}/{total}</b> groups.")
         return
 
-    if cmd == "/quiz":
-        send_message(chat_id, "⏳ Starting quiz in background...")
-        threading.Thread(target=send_daily_quiz, daemon=True).start()
-        return
 
     if cmd == "/cancel":
         clear_pending_action(user_id)

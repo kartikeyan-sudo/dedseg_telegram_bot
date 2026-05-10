@@ -147,46 +147,47 @@ def handle_update(update):
     username = message["from"].get("username", "")
     message_id = message["message_id"]
 
-    # ── Non-admin private chat: Livegram welcome + message forwarding ─────────
+    # ── Non-admin private chat: welcome ───────────────────────────────────────
     if chat_type == "private" and user_id != ADMIN_ID:
         if text.startswith("/start"):
             send_message(
                 chat_id,
                 f"👋 Hi <b>{first_name}</b>! Welcome to <b>Daily Static GK</b>.\n\n"
                 "📚 We deliver daily quizzes, GK facts, and motivation to our channels.\n"
-                "🎯 Join our community to stay sharp every day!\n\n"
-                "📩 Send us a message anytime and our team will respond.",
+                "🎯 Join our community to stay sharp every day!",
             )
             return
-        # Forwarding disabled in GK Bot to avoid duplicate notifications.
-        # Use the Main Bot for contacting the team.
         return
 
-    # ── Non-admin non-private: ignore ────────────────────────────────────────
-    if user_id != ADMIN_ID:
-        return
-
-    # ── Admin commands ────────────────────────────────────────────────────────
+    # ── Command Triggers (Public in Groups, Admin-only in DM) ─────────────────
     cmd = text.split()[0].lower() if text else ""
-
-    if cmd in ("/start", "/menu", "/help"):
-        send_message(chat_id, build_menu_text(), reply_markup=ADMIN_MENU_INLINE)
-        return
+    is_admin = (user_id == ADMIN_ID)
+    is_group = (chat_type in ("group", "supergroup"))
 
     if cmd == "/motivation":
         send_message(chat_id, "⏳ Sending motivation...")
-        threading.Thread(target=send_motivation, daemon=True).start()
+        threading.Thread(target=send_motivation, args=(chat_id,), daemon=True).start()
         return
 
-    if cmd == "/fact":
-        send_message(chat_id, "⏳ Sending GK fact...")
-        threading.Thread(target=send_daily_fact, daemon=True).start()
+    if cmd in ("/fact", "/oneliner"):
+        send_message(chat_id, "⏳ Sending one-liner...")
+        threading.Thread(target=send_daily_fact, args=(chat_id,), daemon=True).start()
         return
 
     if cmd == "/quiz":
+        # Quizzes are long; keep them admin-only to avoid spam
+        if not is_admin:
+            send_message(chat_id, "⚠️ Only admins can trigger a full quiz set.")
+            return
         send_message(chat_id, "⏳ Starting quiz in background...")
-        threading.Thread(target=send_daily_quiz, daemon=True).start()
+        threading.Thread(target=send_daily_quiz, args=(chat_id,), daemon=True).start()
         return
+
+    # ── Admin-only Menu ───────────────────────────────────────────────────────
+    if is_admin:
+        if cmd in ("/start", "/menu", "/help"):
+            send_message(chat_id, build_menu_text(), reply_markup=ADMIN_MENU_INLINE)
+            return
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

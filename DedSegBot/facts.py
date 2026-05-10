@@ -2,7 +2,8 @@ import requests
 from DedSegBot.quiz_config import BOT_TOKEN, QUIZ_CHAT_ID
 
 
-def send_daily_fact():
+def send_daily_fact(target_id=None):
+    chat_id = target_id or QUIZ_CHAT_ID
     try:
         r = requests.get("http://numbersapi.com/random/trivia", timeout=15)
         r.raise_for_status()
@@ -15,7 +16,7 @@ def send_daily_fact():
         r = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             json={
-                "chat_id": QUIZ_CHAT_ID,
+                "chat_id": chat_id,
                 "text": f"🧠 DAILY GK FACT\n\n{fact}",
             },
             timeout=15,

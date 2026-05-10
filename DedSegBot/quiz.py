@@ -16,11 +16,12 @@ CATEGORIES = {
 }
 
 
-def send_message(text):
+def send_message(text, target_id=None):
+    chat_id = target_id or QUIZ_CHAT_ID
     try:
         r = requests.post(
             f"{BASE_URL}/sendMessage",
-            json={"chat_id": QUIZ_CHAT_ID, "text": text},
+            json={"chat_id": chat_id, "text": text},
             timeout=15,
         )
         print(r.text)
@@ -28,12 +29,13 @@ def send_message(text):
         print(f"[quiz send_message] error: {e}")
 
 
-def send_poll(question, options, correct_index, explanation):
+def send_poll(question, options, correct_index, explanation, target_id=None):
+    chat_id = target_id or QUIZ_CHAT_ID
     try:
         r = requests.post(
             f"{BASE_URL}/sendPoll",
             json={
-                "chat_id": QUIZ_CHAT_ID,
+                "chat_id": chat_id,
                 "question": question[:250],
                 "options": options,
                 "type": "quiz",
@@ -79,19 +81,20 @@ def fetch_questions(category_id, amount=5, retries=3):
     return []
 
 
-def send_daily_quiz():
+def send_daily_quiz(target_id=None):
     send_message(
         "📚 DAILY SSC / UPSC QUIZ SET 🔥\n\n"
         "✅ English + Hindi Questions\n"
-        "🎯 Attempt all quizzes carefully!"
+        "🎯 Attempt all quizzes carefully!",
+        target_id=target_id
     )
 
     for category_name, category_id in CATEGORIES.items():
-        send_message(f"━━━━━━━━━━━━━━━\n{category_name}\n━━━━━━━━━━━━━━━")
+        send_message(f"━━━━━━━━━━━━━━━\n{category_name}\n━━━━━━━━━━━━━━━", target_id=target_id)
 
         questions = fetch_questions(category_id)
         if not questions:
-            send_message(f"⚠️ Could not load questions for {category_name}. Skipping.")
+            send_message(f"⚠️ Could not load questions for {category_name}. Skipping.", target_id=target_id)
             continue
 
         for q in questions:
@@ -109,7 +112,7 @@ def send_daily_quiz():
                 random.shuffle(eng_opts)
                 eng_idx = eng_opts.index(eng_correct)
                 eng_opts = [o[:90] for o in eng_opts]
-                send_poll(eng_q, eng_opts, eng_idx, f"✅ Correct Answer: {eng_opts[eng_idx]}")
+                send_poll(eng_q, eng_opts, eng_idx, f"✅ Correct Answer: {eng_opts[eng_idx]}", target_id=target_id)
                 time.sleep(2)
 
                 # Hindi poll
@@ -117,7 +120,7 @@ def send_daily_quiz():
                 random.shuffle(hi_opts)
                 hi_idx = hi_opts.index(hi_correct)
                 hi_opts = [o[:90] for o in hi_opts]
-                send_poll(hi_q, hi_opts, hi_idx, f"✅ सही उत्तर: {hi_opts[hi_idx]}")
+                send_poll(hi_q, hi_opts, hi_idx, f"✅ सही उत्तर: {hi_opts[hi_idx]}", target_id=target_id)
                 time.sleep(2)
 
             except Exception as e:

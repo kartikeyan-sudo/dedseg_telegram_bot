@@ -6,7 +6,8 @@ FALLBACK_QUOTE = (
 )
 
 
-def send_motivation():
+def send_motivation(target_id=None):
+    chat_id = target_id or QUIZ_CHAT_ID
     try:
         r = requests.get("https://zenquotes.io/api/random", timeout=15)
         r.raise_for_status()
@@ -23,7 +24,7 @@ def send_motivation():
     try:
         r = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            json={"chat_id": QUIZ_CHAT_ID, "text": text},
+            json={"chat_id": chat_id, "text": text},
             timeout=15,
         )
         print(f"[motivation] Telegram response: {r.text}")
